@@ -2,7 +2,9 @@ local config = require 'config.client'
 local isScoreboardOpen, onDutyAdmins
 
 local function shouldShowPlayerId(targetServerId)
-    if config.idVisibility == 'all' then return true end
+    if config.idVisibility == 'all' then
+        return GetPedDrawableVariation(PlayerPedId(6), 1) == 0 
+    end
     if onDutyAdmins[cache.serverId] then return true end
     if config.idVisibility == 'admin_only' then return false end
     if config.idVisibility == 'admin_excluded' and onDutyAdmins[targetServerId] then return false end
@@ -46,30 +48,30 @@ local function openScoreboard()
     local players, cops, admins = lib.callback.await('qbx_scoreboard:server:getScoreboardData')
     onDutyAdmins = admins
 
-    SendNUIMessage({
-        action = 'open',
-        players = players,
-        maxPlayers = config.maxPlayers,
-        requiredCops = GlobalState.illegalActions,
-        currentCops = cops
-    })
+    -- SendNUIMessage({
+    --     action = 'open',
+    --     players = players,
+    --     maxPlayers = config.maxPlayers,
+    --     requiredCops = GlobalState.illegalActions,
+    --     currentCops = cops
+    -- })
 
     isScoreboardOpen = true
     drawPlayerNumbers()
 end
 
 local function closeScoreboard()
-    SendNUIMessage({
-        action = 'close',
-    })
+    -- SendNUIMessage({
+    --     action = 'close',
+    -- })
 
     isScoreboardOpen = false
 end
 
 if config.toggle then
     lib.addKeybind({
-        name = 'scoreboard',
-        description = 'Open Scoreboard',
+        name = 'showid',
+        description = 'Show Player IDs',
         defaultKey = config.openKey,
         onPressed = function()
             if isScoreboardOpen then
@@ -81,8 +83,8 @@ if config.toggle then
     })
 else
     lib.addKeybind({
-        name = 'scoreboard',
-        description = 'Open Scoreboard',
+        name = 'showid',
+        description = 'Show Player IDs',
         defaultKey = config.openKey,
         onPressed = openScoreboard,
         onReleased = closeScoreboard
